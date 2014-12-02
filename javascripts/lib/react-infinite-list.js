@@ -230,20 +230,14 @@
       return this.getDOMNode().scrollTop;
     },
 
+    getListFullHeight: function () {
+      var fullLength = this.props.children.length;
+      return (fullLength * this._configuration.DEFAULT_ITEM_HEIGHT) || 0;
+    },
+
     //
     //  Real impl
     //
-
-    getListFullHeight: function () {
-        var fullLength = this.props.children.length;
-        return (fullLength * this._configuration.DEFAULT_ITEM_HEIGHT) || 0;
-     },
-
-
-    reposItems : function () {
-      // TODO: Set state with new start and end idx and of course correct offset top
-    },
-
     rePositionList: function (newScroll) {
 
        var isGoingUp = newScroll < this.oldScroll;
@@ -409,7 +403,10 @@
 
 
 
-  // wrapper for children components
+  /*
+  * Wrapper for children components
+  * Used to cache the size of elements
+  */
   InfiniteListItem = React.createClass({
 
 
