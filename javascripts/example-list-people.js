@@ -23,11 +23,11 @@ define(['lib/jsx!lib/react-infinite-list'], function (ReactInfiniteList) {
         return (<Person element={element} key={element.id} />);
       });
 
-        return (
-          <ReactInfiniteList>
-            {elements}
-          </ReactInfiniteList>
-        );
+      return (
+        <ReactInfiniteList>
+          {elements}
+        </ReactInfiniteList>
+      );
 
     }
 
