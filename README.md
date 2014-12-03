@@ -32,3 +32,6 @@ var myListOfReactComponents = _.map(MyLargeJSONDataset, function (element) {
  
 Caveats :
 ------ 
+- There is still some optimization to be made on the boundaries
+- We should be able to make it work on the window ( as opposed to inside a div with overflow scroll )
+
