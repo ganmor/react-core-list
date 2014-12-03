@@ -3,13 +3,8 @@
   'use strict';
 
   var getWindowHeight,
-      getScroll,
       nextFrame,
       cancelFrame,
-      testDiv,
-      PROPS,
-      TRANSFORM_PREFIX,
-      TRANSFORM_ORIGIN_PREFIX,
       DEFAULTS,
       InfiniteListComponent,
       InfiniteListItem;
@@ -18,7 +13,6 @@
   // Utility
 
   getWindowHeight = function() { return  window.innerHeight };
-  getScroll = function() { return  window.scrollTop };
 
   nextFrame = (function () {
      return window.requestAnimationFrame ||
@@ -39,26 +33,6 @@
         window.msCancelRequestAnimationFrame ||
         window.clearTimeout;
   })();
-
-
-  // Initialisation
-  testDiv = document.createElement('div')
-  PROPS = ["-moz", "-o", "-webkit", "-ms"]
-  PROPS.forEach(function (prop) {
-    var browserPrefix, testProp;
-
-    function cap(str) {
-       return str.charAt(0).toUpperCase() + str.substr(1).toLowerCase();
-    }
-
-    browserPrefix = prop;
-    testProp = cap(browserPrefix.slice(1, prop.length));
-    testDiv.style[testProp + "Transition"] = "all 1s ease";
-    if (testDiv.style[testProp + "TransitionProperty"]) {
-       TRANSFORM_PREFIX = browserPrefix + "-transform";
-       TRANSFORM_ORIGIN_PREFIX = browserPrefix + "-transform-origin";
-    }
-  });
 
 
   // Default Config
@@ -82,7 +56,6 @@
          this.setState({
            initialOffsetTop : this.getDOMNode().offsetTop,
            viewPortHeight : (getWindowHeight() - this.getDOMNode().offsetTop - this._configuration.MARGIN_BOTTOM),
-           oldScroll : getScroll(),
            listHeight : this.getListFullHeight()
          });
 
@@ -179,7 +152,8 @@
           };
 
          positionningDivStyle = {
-           WebkitTransform : 'translate(0, ' + (this.state.offsetTop||0) + 'px)'
+           WebkitTransform : 'translate(0, ' + (this.state.offsetTop||0) + 'px)',
+           MozTransform : 'translate(0, ' + (this.state.offsetTop||0) + 'px)'
          };
 
          listSizerStyle = {
