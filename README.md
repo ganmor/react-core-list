@@ -4,6 +4,7 @@ react-infinite-list
 This react component turn any list of react components into a infinite list.
 
 WARNING : While working, this component is still a proof of concept
+TODO: Proper Common js format, build and example folder
 
 This idea is to keep the dom as small as possible by rendering only the elements that are currently in the viewport.
 This project is mainly targeted at mobile devices because they are the first to get sluggish when you scroll lists of zillions elements, but it can also be usefull on desktop.
