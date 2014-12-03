@@ -18,3 +18,5 @@ var myListOfReactComponents = _.map(MyLargeJSONDataset, function (element) {
   {myListOfReactComponents}
 </ReactInfiniteList>
  ```
+Caveats
+------ :
