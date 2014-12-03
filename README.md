@@ -3,9 +3,13 @@ react-infinite-list
 
 This react component turn any list of react components into a infinite list.
 
+WARNING : While working, this component is still a proof of concept
+
 Use case :
-This idea is to keep the dom as small as possible.
-This project is mainly target at mobile devices because they are the first to get sluggish when you scroll lists of zillions elements, but it can also be usefull on desktop.
+
+This idea is to keep the dom as small as possible by rendering only the elements that are currently in the viewport.
+This project is mainly targeted at mobile devices because they are the first to get sluggish when you scroll lists of zillions elements, but it can also be usefull on desktop.
+Elements can be different heights ( This is the tricky part ), but the biggerr the size differences between elements is the more edge cases you will hit.
 
 
 How does it work :
