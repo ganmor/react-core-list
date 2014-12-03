@@ -65,7 +65,7 @@
   DEFAULTS = {};
   DEFAULTS.DEFAULT_ITEM_HEIGHT = 35;
   DEFAULTS.MARGIN_BOTTOM = 0;
-  DEFAULTS.MARGIN_OUT_SCREEN = 5 * DEFAULTS.DEFAULT_ITEM_HEIGHT;
+  DEFAULTS.MARGIN_OUT_SCREEN = 10 * DEFAULTS.DEFAULT_ITEM_HEIGHT;
 
 
   var factory = function (React, _) {
@@ -92,7 +92,7 @@
        getInitialState : function (){
          return {
            startIdx : 0,
-           endIdx : 20, /* FIXME */
+           endIdx : 30, /* FIXME */
            offsetTop : 0,
            differential : false
          }
@@ -116,24 +116,34 @@
          instance_ = this;
          offsetCorrection = 0;
 
+         console.log('UPDATE LOOP TRIGGERED');
+
          _.each(this.props.children, function (ReactCpnt, idx) {
 
-            var ref, wasDisplayed, isDisplayed;
+            var ref, wasDisplayed, isDisplayed, hasBeenRemovedBefore, hasBeenAddedBefore, direction, elementAppeared, elementDisappeared;
 
             refName = "infinite-list-item-" + idx;
             ref = instance_.refs[refName];
 
-            wasDisplayed = (ref && ref.props.rendered === true);
+            wasDisplayed = idx >= this.state.startIdx && idx <= this.state.endIdx;
             isDisplayed = idx >= nextState.startIdx && idx <= nextState.endIdx;
+
+            elementAppeared = isDisplayed && !wasDisplayed;
+            elementDisappeared = !isDisplayed && wasDisplayed;
+
+            direction = nextState.startIdx > this.state.startIdx ? 'down' : 'up';
+
 
             // Buffering did not occur correctly
             if (!ref || !ref._cachedHeight){ return; }
 
-            if (isDisplayed && !wasDisplayed && nextState.startIdx < this.state.startIdx ) {
-              offsetCorrection = offsetCorrection - ref._cachedHeight;
+
+            if (direction === 'up' && elementAppeared && idx <= this.state.startIdx) {
+               offsetCorrection = offsetCorrection - ref._cachedHeight;
             }
 
-            if (!isDisplayed && wasDisplayed &&  nextState.startIdx > this.state.startIdx) {
+
+            if (direction === 'down'&& elementDisappeared && idx < nextState.startIdx) {
               offsetCorrection = offsetCorrection + ref._cachedHeight;
             }
 
@@ -185,12 +195,14 @@
 
            var refName, isRendered, isDisplayed;
 
+           if (idx < startIdx-20) { return; }
+           if (idx > endIdx+20) { return; }
+
            refName = "infinite-list-item-" + idx;
            isDisplayed = idx >= startIdx && idx <= endIdx;
 
-
            return (
-            <InfiniteListItem rendered={isDisplayed} ref={refName}>
+            <InfiniteListItem rendered={isDisplayed} key={idx} ref={refName}>
               {ReactCpnt}
             </InfiniteListItem>
            );
@@ -243,7 +255,7 @@
          var isGoingDown = newScroll > this.oldScroll;
 
          var isBeforeTop = (newScroll < this.state.offsetTop);
-         var isAfterBottom = (newScroll > this.state.offsetBottom);
+         var isAfterBottom = ((newScroll + this.state.viewPortHeight) > this.state.offsetBottom);
 
          var hasReachedTopOfTheList = (this.state.startIdx == 0);
          var hasReachedBottomOfTheList = (this.state.endIdx == (this.props.children.length));
@@ -270,8 +282,9 @@
 
       repositionListUp: function (newScroll) {
 
-         var targetOffsetTop, move, willReachTop, isTooCloseToBottom;
+         var targetOffsetTop, move, willReachTop, isTooCloseToBottom, instance_;
 
+         instance_ = this;
 
          // Check if the bottom of the list is not too close
          isTooCloseToBottom = this.state.offsetBottom < newScroll + this.state.viewPortHeight +  ( this._configuration.MARGIN_OUT_SCREEN / 2)
@@ -339,7 +352,7 @@
           fullLength = this.props.children.length;
 
           startPosition = Math.round((newScroll * fullLength) / this.getListFullHeight());
-          endPosition = Math.round(startPosition + 20);
+          endPosition = Math.round(startPosition + 30);
 
           this.offsetTop = newScroll - this.state.viewPortHeight;
           this.offsetTop <= 0 ? (this.offsetTop = 0) : (this.offsetTop = this.offsetTop);
@@ -384,6 +397,9 @@
            endRenderIdx = this.state.startIdx;
          }
 
+         nextStartIdx = Math.round(nextStartIdx);
+         nextEndIdx = Math.round(nextEndIdx);
+
          toRender = this.props.children.slice(startRenderIdx, endRenderIdx);
 
          // Force new children to render once ( offscreen) so they can cache their size
@@ -420,6 +436,18 @@
         if (this.getDOMNode()) {
           this._cachedHeight = this.getDOMNode().offsetHeight;
         }
+      },
+
+      shouldComponentUpdate : function (nextProps, nextState) {
+
+        var shouldComponentUpdate;
+        if (!this.props) {
+          return true;
+        }
+
+        shouldComponentUpdate = this.props.rendered != nextProps.rendered;
+
+        return shouldComponentUpdate;
       },
 
       render : function () {

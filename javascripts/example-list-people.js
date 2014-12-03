@@ -20,7 +20,7 @@ define(['lib/jsx!lib/react-infinite-list'], function (ReactInfiniteList) {
     render : function () {
 
       var elements = _.map(this.props.jsonList, function (element) {
-        return (<Person element={element} />);
+        return (<Person element={element} key={element.id} />);
       });
 
         return (
