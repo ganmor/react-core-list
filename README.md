@@ -16,7 +16,7 @@ How does it work :
 - Only elements currently in the viewport are rendered ( with some margin )
 - On each rendering frame, it compare the new scroll with the rendered position, if it overlaps, it render the missing elements, if it does not overlap is render the list at an appoximation of it's supposed position
 
-See demo here
+See demo here : http://ganmor.github.io/react-infinite-list
 
 Example of use :
 --------------
