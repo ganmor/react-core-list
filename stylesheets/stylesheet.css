@@ -423,3 +423,7 @@ Small Device Styles
   }
 
 }
+
+.item-line-style > * {
+  display:inline-block;
+}
