@@ -30,7 +30,7 @@ Example of use :
 ```
 {
   DEFAULT_ITEM_HEIGHT : 'value'
-  // Default value is 50, this is used the to compute an average size for the list
+  // Default value is 50, this is used the compute an average size for the list
 }
 ```
 
@@ -46,6 +46,7 @@ var myListOfReactComponents = _.map(MyLargeJSONDataset, function (element) {
  
 Caveats :
 ------ 
-- There is still some optimization to be made on the boundaries
-- We should be able to make it work on the window ( as opposed to inside a div with overflow scroll )
+- When hiting the bottom of the list we need to adjust this size according to real elements height
+- no support of ie, it just a matter of adding the ms prefix in the transform
+- only support div overflow scroll, it should work while scrolling on the window
 
