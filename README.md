@@ -29,7 +29,8 @@ Example of use :
 
 ```
 {
-  DEFAULT_ITEM_HEIGHT : 'value' // Default value is 50, this is used the to compute an average size for the list
+  DEFAULT_ITEM_HEIGHT : 'value'
+  // Default value is 50, this is used the to compute an average size for the list
 }
 ```
 
