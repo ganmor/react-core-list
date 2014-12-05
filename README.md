@@ -27,7 +27,7 @@ See demo here : http://ganmor.github.io/react-infinite-list
 Example of use :
 --------------
 
-Config
+Config :
 ```
 {
   DEFAULT_ITEM_HEIGHT : 'value'
@@ -35,7 +35,7 @@ Config
 }
 ```
 
-Use
+Use :
  ```
 <ReactInfiniteList config={myConfig}>
   {myListOfReactComponents}
