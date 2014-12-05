@@ -1,0 +1,32 @@
+{
+  "name": "react-infinite-list",
+  "version": "0.0.1",
+  "authors": [
+    "Morgan Laupies <morgan.laupies@gmail.com>"
+  ],
+  "description": "Makes huge list of react elements list usable by rendering only the elements in the visible viewport ",
+  "main": "dist/react-infinite-list.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "react",
+    "react-component",
+    "scrolling",
+    "uitableview",
+    "infinite"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.12"
+  }
+}
