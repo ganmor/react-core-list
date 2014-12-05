@@ -3,7 +3,7 @@ require(['lib/jsx!example-list-people', 'data/people-dataset'], function (Exampl
 
   var mountNode = document.querySelector('#placeholder');
 
-  React.render(React.createElement(ExampleList, { jsonList : data }), mountNode);
+  React.render(React.createElement(ExampleList, { jsonList : data }) , mountNode);
 
 
 });
