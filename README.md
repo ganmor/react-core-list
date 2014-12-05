@@ -3,30 +3,42 @@ react-infinite-list
 
 This react component turn any list of react components into a infinite list.
 
-WARNING : While working, this component is still a proof of concept
-TODO: Proper Common js format, build and example folder
-
 This idea is to keep the dom as small as possible by rendering only the elements that are currently in the viewport.
-This project is mainly targeted at mobile devices because they are the first to get sluggish when you scroll lists of zillions elements, but it can also be usefull on desktop.
-Elements can be different heights ( This is the tricky part ), but the biggerr the size differences between elements is the more edge cases you will hit.
+The list accepts element with different sizes, that the tricky part.
+
+
+Warning : The biggerr the size differences between elements is the more edge cases you will hit.
 
 
 How does it work :
 -----------------
-- On component mount it creates a div based on a appoximation of the list size.
-- Only elements currently in the viewport are rendered ( with some margin )
-- On each rendering frame, it compare the new scroll with the rendered position, if it overlaps, it render the missing elements, if it does not overlap it renders the list at an appoximation based on the scroll position
+
+The very basic : 
+Only element in the current viewport are in the dom.
+
+In more details :
+On each rendering frame, the list check the scroll position if it's before the first rendered element it adds item before if it's after it add elements after. 
+If it's way different, ( the new rendered elements and the previous ones do not overlap, it renderes at an appoximation of the position based on items mean height.
+
+Variables name sare pretty straightforward, you can have a look for yourself.
 
 See demo here : http://ganmor.github.io/react-infinite-list
 
 Example of use :
 --------------
+
+```
+{
+  DEFAULT_ITEM_HEIGHT : 'value' // Default value is 50, this is used the to compute an average size for the list
+}
+```
+
  ```
 var myListOfReactComponents = _.map(MyLargeJSONDataset, function (element) {
   return (<MyReactClassForElement element={element} key={element.id} />);
 });
 
-<ReactInfiniteList>
+<ReactInfiniteList config={myConfig}>
   {myListOfReactComponents}
 </ReactInfiniteList>
  ```
