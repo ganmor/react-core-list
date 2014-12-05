@@ -35,9 +35,6 @@ Example of use :
 ```
 
  ```
-var myListOfReactComponents = _.map(MyLargeJSONDataset, function (element) {
-  return (<MyReactClassForElement element={element} key={element.id} />);
-});
 
 <ReactInfiniteList config={myConfig}>
   {myListOfReactComponents}
