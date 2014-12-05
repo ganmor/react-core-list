@@ -15,6 +15,10 @@
       InfiniteListComponent,
       InfiniteListItem;
 
+
+  // patch
+  React = window.React;
+
   // Utility
 
   getWindowHeight = function() { return  window.innerHeight };
@@ -112,16 +116,18 @@
 
 
           // Buffering did not occur correctly
-          if (!ref || !ref._cachedHeight){ return; }
+
 
 
           if (direction === 'up' && elementAppeared && idx <= this.state.startIdx) {
-             offsetCorrection = offsetCorrection - ref._cachedHeight;
+             if (!ref || !ref.state.cachedHeight){ console.log("height was not computed"); }
+             offsetCorrection = offsetCorrection - ref.state.cachedHeight;
           }
 
 
           if (direction === 'down'&& elementDisappeared && idx < nextState.startIdx) {
-            offsetCorrection = offsetCorrection + ref._cachedHeight;
+             if (!ref || !ref.state.cachedHeight){ console.log("height was not computed"); }
+            offsetCorrection = offsetCorrection + ref.state.cachedHeight;
           }
 
        }, this);
@@ -362,28 +368,34 @@
          nextStartIdx = this.state.startIdx - move;
          nextEndIdx = this.state.endIdx - move;
 
-         // Compute new element that will be rendered
-         startRenderIdx = this.state.endIdx;
-         endRenderIdx = this.state.endIdx + move;
+
+         startRenderIdx = this.state.startIdx - move;
+         endRenderIdx = this.state.startIdx;
+
 
        } else if (direction === 'down') {
 
          nextStartIdx = this.state.startIdx + move;
          nextEndIdx = this.state.endIdx + move;
 
-         startRenderIdx = this.state.startIdx - move;
-         endRenderIdx = this.state.startIdx;
+        // Compute new element that will be rendered
+         startRenderIdx = this.state.endIdx;
+         endRenderIdx = this.state.endIdx + move;
+
        }
 
        nextStartIdx = Math.round(nextStartIdx);
        nextEndIdx = Math.round(nextEndIdx);
+       startRenderIdx = Math.round(startRenderIdx);
+       endRenderIdx = Math.round(endRenderIdx);
 
        toRender = this.props.children.slice(startRenderIdx, endRenderIdx);
 
        // Force new children to render once ( offscreen) so they can cache their size
        _.each( toRender, function (element, idx) {
+
          if (instance_.refs['infinite-list-item-' + (startRenderIdx + idx)]
-             && !instance_.refs['infinite-list-item-' + (startRenderIdx + idx)]._cachedHeight) {
+             && !instance_.refs['infinite-list-item-' + (startRenderIdx + idx)].state.cachedHeight) {
           instance_.refs['infinite-list-item-' + (startRenderIdx + idx)].setState({ rendered : true, buffer : true });
          }
        }, this);
@@ -403,16 +415,20 @@
   var InfiniteListItem = React.createClass({
 
 
+    getInitialState : function () {
+      return {};
+    },
+
     // Cache the height of the element
     componentDidMount : function () {
       if (this.getDOMNode()) {
-        this._cachedHeight = this.getDOMNode().offsetHeight;
+        this.state.cachedHeight = this.getDOMNode().offsetHeight;
       }
     },
 
     componentDidUpdate : function () {
       if (this.getDOMNode()) {
-        this._cachedHeight = this.getDOMNode().offsetHeight;
+        this.state.cachedHeight = this.getDOMNode().offsetHeight;
       }
     },
 
