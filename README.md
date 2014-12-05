@@ -27,6 +27,7 @@ See demo here : http://ganmor.github.io/react-infinite-list
 Example of use :
 --------------
 
+Config :
 ```
 {
   DEFAULT_ITEM_HEIGHT : 'value'
@@ -34,11 +35,8 @@ Example of use :
 }
 ```
 
+Use :
  ```
-var myListOfReactComponents = _.map(MyLargeJSONDataset, function (element) {
-  return (<MyReactClassForElement element={element} key={element.id} />);
-});
-
 <ReactInfiniteList config={myConfig}>
   {myListOfReactComponents}
 </ReactInfiniteList>
