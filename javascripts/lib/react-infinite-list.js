@@ -1,6 +1,6 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(['react', '_'], factory);
+        define(['react', 'underscore'], factory);
     } else if (typeof exports === 'object') {
         module.exports = factory(require('react'), require('underscore'));
     } else {
@@ -238,7 +238,7 @@
 
 
     getScroll : function () {
-      return $(window).scrollTop() -$(this.getDOMNode()).offset().top;
+      return window.document.body.scrollTop - this.getDOMNode().offsetTop;
     },
 
     getListFullHeight: function () {
