@@ -198,7 +198,7 @@
          isDisplayed = idx >= startIdx && idx <= endIdx;
 
          return (
-          <InfiniteListItem rendered={isDisplayed} key={idx} ref={refName}>
+          <InfiniteListItem rendered={isDisplayed} key={ReactCpnt.key} ref={refName}>
             {ReactCpnt}
           </InfiniteListItem>
          );
