@@ -1,6 +1,6 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(['react', 'underscore'], factory);
+        define(['react', '_'], factory);
     } else if (typeof exports === 'object') {
         module.exports = factory(require('react'), require('underscore'));
     } else {
@@ -46,7 +46,7 @@
 
   // Default Config
   DEFAULTS = {};
-  DEFAULTS.DEFAULT_ITEM_HEIGHT = 35;
+  DEFAULTS.DEFAULT_ITEM_HEIGHT = 95;
   DEFAULTS.MARGIN_BOTTOM = 0;
   DEFAULTS.MARGIN_OUT_SCREEN = 10 * DEFAULTS.DEFAULT_ITEM_HEIGHT;
 
@@ -70,12 +70,20 @@
        this.keepDisplayInSync();
      },
 
+     componentWillUnmount : function () {
+      this.tearDownDisplayUpdate();
+     },
+
      getInitialState : function (){
        return {
          startIdx : 0,
          endIdx : 30, /* FIXME */
+         bufferStartIdx : 0,
+         bufferEndIdx : 40,
+         bufferLength : 10,
          offsetTop : 0,
-         differential : false
+         differential : false,
+         realSizes : {}
        }
      },
 
@@ -90,21 +98,24 @@
 
        // Compare states, maybe measure  height ? and compute list virtual height
 
-       var refName, isRendered, wasDisplayed, willBeAdded, offsetCorrection, instance_;
+       var refName, isRendered, wasDisplayed, willBeAdded, offsetCorrection, instance_, errorCorrecting;
 
        if (!nextState.differential) { return; }
 
        instance_ = this;
        offsetCorrection = 0;
+       errorCorrecting = false;
 
-       console.log('UPDATE LOOP TRIGGERED');
 
        _.each(this.props.children, function (ReactCpnt, idx) {
 
-          var ref, wasDisplayed, isDisplayed, hasBeenRemovedBefore, hasBeenAddedBefore, direction, elementAppeared, elementDisappeared;
+          var ref, wasDisplayed, isDisplayed, hasBeenRemovedBefore, hasBeenAddedBefore, direction, elementAppeared, elementDisappeared, realSizes;
+
+          realSizes = this.state.realSizes;
 
           refName = "infinite-list-item-" + idx;
           ref = instance_.refs[refName];
+
 
           wasDisplayed = idx >= this.state.startIdx && idx <= this.state.endIdx;
           isDisplayed = idx >= nextState.startIdx && idx <= nextState.endIdx;
@@ -114,27 +125,31 @@
 
           direction = nextState.startIdx > this.state.startIdx ? 'down' : 'up';
 
-
-          // Buffering did not occur correctly
-
-
+          realSizes[refName] = ref && ref && ref.state.cachedHeight ? ref.state.cachedHeight : realSizes[refName];
 
           if (direction === 'up' && elementAppeared && idx <= this.state.startIdx) {
-             if (!ref || !ref.state.cachedHeight){ console.log("height was not computed"); }
-             offsetCorrection = offsetCorrection - ref.state.cachedHeight;
+             if (!realSizes[refName]) { console.log("height was not computed"); errorCorrecting=true; }
+             offsetCorrection = offsetCorrection - realSizes[refName];
           }
 
 
           if (direction === 'down'&& elementDisappeared && idx < nextState.startIdx) {
-             if (!ref || !ref.state.cachedHeight){ console.log("height was not computed"); }
-            offsetCorrection = offsetCorrection + ref.state.cachedHeight;
+            if (!realSizes[refName]) { console.log("height was not computed"); errorCorrecting=true; }
+            offsetCorrection = offsetCorrection + realSizes[refName];
           }
 
        }, this);
 
 
+
+       if (nextState.offsetTop < 0 || errorCorrecting)  {
+         return this.approximateInsertion(this.getScroll());
+       }
+
        // Get correct offset top
        nextState.offsetTop = nextState.offsetTop + offsetCorrection;
+
+
 
      },
 
@@ -154,9 +169,6 @@
        instance_ = this;
 
        wrapperStyle = {
-          height : this.state.viewPortHeight,
-          webkitOverflowScrolling : 'touch',
-          overflowY:'auto',
           width:'100%',
           position:'relative'
         };
@@ -190,7 +202,7 @@
             {ReactCpnt}
           </InfiniteListItem>
          );
-       });
+       }, this);
 
        return (
          <div style={wrapperStyle}>
@@ -211,8 +223,12 @@
     keepDisplayInSync : function () {
       var instance_ = this;
       function repos() {
-          nextFrame(function () { instance_.rePositionList.call(instance_, instance_.getScroll()); });
-       }
+        nextFrame(function () {
+          if (!instance_.isMounted()){ return; }
+
+          instance_.rePositionList.call(instance_, instance_.getScroll());
+        });
+      }
       this.displaySyncInterval =  window.setInterval(repos, 1); // Get rid of those 50 ms ?
     },
 
@@ -222,7 +238,7 @@
 
 
     getScroll : function () {
-      return this.getDOMNode().scrollTop;
+      return $(window).scrollTop() -$(this.getDOMNode()).offset().top;
     },
 
     getListFullHeight: function () {
@@ -403,10 +419,7 @@
        return { nextStartIdx : nextStartIdx, nextEndIdx : nextEndIdx };
      }
 
-
  });
-
-
 
   /*
   * Wrapper for children components
@@ -434,12 +447,12 @@
 
     shouldComponentUpdate : function (nextProps, nextState) {
 
-      var shouldComponentUpdate;
+      var renderStatusChanged, shouldComponentUpdate;
       if (!this.props) {
         return true;
       }
 
-      shouldComponentUpdate = this.props.rendered != nextProps.rendered;
+      shouldComponentUpdate = (this.props.rendered != nextProps.rendered) || nextProps.rendered;
 
       return shouldComponentUpdate;
     },
@@ -448,9 +461,7 @@
 
       var style;
 
-      if (!this.props.rendered) {
-        return false;
-      }
+      if (!this.props.rendered) { return false; }
 
       style = {};
       style.overflow = 'hidden'
