@@ -25,27 +25,17 @@ See demo here : http://ganmor.github.io/react-infinite-list
 
 Example of use :
 --------------
-
-Config :
-```
-{
-  DEFAULT_ITEM_HEIGHT : 'value'
-  // Default value is 50, this is used the compute an average size for the list
-}
-```
-
-Use :
  ```
 <ReactInfiniteList config={myConfig}>
   {myListOfReactComponents}
 </ReactInfiniteList>
  ```
+  Do not forget to add a key on your components !
  
 Caveats :
 ------ 
 - When hiting the bottom of the list we need to adjust this size according to real elements height
 - no support of ie, it just a matter of adding the ms prefix in the transform
-- only support div overflow scroll, it should work while scrolling on the window
 
 Todo
 ----
