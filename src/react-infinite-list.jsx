@@ -1,6 +1,6 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(['react', '_'], factory);
+        define(['react', 'underscore'], factory);
     } else if (typeof exports === 'object') {
         module.exports = factory(require('react'), require('underscore'));
     } else {
@@ -105,17 +105,17 @@
        instance_ = this;
        offsetCorrection = 0;
        errorCorrecting = false;
-       
+
 
        _.each(this.props.children, function (ReactCpnt, idx) {
 
           var ref, wasDisplayed, isDisplayed, hasBeenRemovedBefore, hasBeenAddedBefore, direction, elementAppeared, elementDisappeared, realSizes;
-          
+
           realSizes = this.state.realSizes;
- 
+
           refName = "infinite-list-item-" + idx;
           ref = instance_.refs[refName];
-         
+
 
           wasDisplayed = idx >= this.state.startIdx && idx <= this.state.endIdx;
           isDisplayed = idx >= nextState.startIdx && idx <= nextState.endIdx;
@@ -126,7 +126,7 @@
           direction = nextState.startIdx > this.state.startIdx ? 'down' : 'up';
 
           realSizes[refName] = ref && ref && ref.state.cachedHeight ? ref.state.cachedHeight : realSizes[refName];
-          
+
           if (direction === 'up' && elementAppeared && idx <= this.state.startIdx) {
              if (!realSizes[refName]) { console.log("height was not computed"); errorCorrecting=true; }
              offsetCorrection = offsetCorrection - realSizes[refName];
@@ -148,8 +148,8 @@
 
        // Get correct offset top
        nextState.offsetTop = nextState.offsetTop + offsetCorrection;
-       
-      
+
+
 
      },
 
@@ -238,7 +238,7 @@
 
 
     getScroll : function () {
-      return $(window).scrollTop() -$(this.getDOMNode()).offset().top;
+      return window.document.body.scrollTop - this.getDOMNode().offsetTop;
     },
 
     getListFullHeight: function () {
@@ -458,7 +458,7 @@
     },
 
     render : function () {
- 
+
       var style;
 
       if (!this.props.rendered) { return false; }
