@@ -7,7 +7,8 @@ This idea is to keep the dom as small as possible by rendering only the elements
 The list accepts element with different sizes, that the tricky part.
 
 
-Warning : The biggerr the size differences between elements is the more edge cases you will hit.
+Warning : The bigger the size difference between elements is, the more edge cases you will hit.
+If you only need elements of equals heights, you can use one of the following projects :
 
 
 How does it work :
@@ -18,9 +19,7 @@ Only element in the current viewport are in the dom.
 
 In more details :
 On each rendering frame, the list check the scroll position if it's before the first rendered element it adds item before if it's after it add elements after. 
-If it's way different, ( the new rendered elements and the previous ones do not overlap, it renderes at an appoximation of the position based on items mean height.
-
-Variables name sare pretty straightforward, you can have a look for yourself.
+If it's way different, ( the new rendered elements and the previous ones do not overlap, it renders at an appoximation of the position based on items mean height.
 
 See demo here : http://ganmor.github.io/react-infinite-list
 
@@ -48,3 +47,7 @@ Caveats :
 - no support of ie, it just a matter of adding the ms prefix in the transform
 - only support div overflow scroll, it should work while scrolling on the window
 
+Todo
+----
+- Remove dependency to underscore
+- Avoid using refs to force render of components
