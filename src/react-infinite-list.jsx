@@ -1,14 +1,27 @@
-var getWindowHeight,
-  nextFrame,
-  cancelFrame,
-  DEFAULTS,
-  InfiniteListComponent,
-  InfiniteListItem,
-  React = require('react'),
-  _ = require('underscore');
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['react', 'underscore'], factory);
+    } else if (typeof exports === 'object') {
+        module.exports = factory(require('react'), require('underscore'));
+    } else {
+        root.InfiniteListComponent = factory(root.React);
+    }
+}(this, function (React, _) {
+
+  var getWindowHeight,
+      nextFrame,
+      cancelFrame,
+      DEFAULTS,
+      InfiniteListComponent,
+      InfiniteListItem;
 
 
-getWindowHeight = function() { return  window.innerHeight };
+  // patch
+  React = window.React;
+
+  // Utility
+
+  getWindowHeight = function() { return  window.innerHeight };
 
   nextFrame = (function () {
      return window.requestAnimationFrame ||
@@ -462,7 +475,6 @@ getWindowHeight = function() { return  window.innerHeight };
     }
   });
 
+  return InfiniteListComponent;
 
-module.exports = InfiniteListComponent;
-
-
+}));
