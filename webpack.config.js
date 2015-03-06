@@ -19,7 +19,7 @@ module.exports = {
   devtool: false,
   entry: [
       'webpack/hot/only-dev-server',
-      './src/scripts/components/ReactInfiniteListApp.js'
+      './src/scripts/examples/ReactInfiniteListAppExample.js'
   ],
 
   stats: {

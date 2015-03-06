@@ -452,6 +452,6 @@ var InfiniteListItem = React.createClass({
   }
 });
 
-return InfiniteListComponent;
+module.exports = InfiniteListComponent;
 
-}));
+
