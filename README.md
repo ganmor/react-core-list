@@ -12,6 +12,7 @@ If you only need elements of equals heights, you can use one of the following pr
 You can find a much better implementation here http://github.com/Polymer/core-list, but it needs porting..
 
 Build : grunt build
+
 Develop : grunt serve
 
 How does it work :
