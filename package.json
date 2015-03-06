@@ -10,6 +10,7 @@
   "mainInput": "ReactInfiniteListApp",
   "mainOutput": "main",
   "dependencies": {
+    "json-loader": "^0.5.1",
     "react": "~0.12.2",
     "underscore": "^1.8.2"
   },

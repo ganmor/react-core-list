@@ -58,8 +58,11 @@ module.exports = {
       test: /\.sass/,
       loader: 'style-loader!css-loader!sass-loader?outputStyle=expanded'
     }, {
-      test: /\.(png|jpg)$/,
-      loader: 'url-loader?limit=8192'
+      test: /\.css$/,
+      loader: 'style-loader!css-loader'
+    }, {
+      test: /\.json/,
+      loader: 'json-loader!css-loader'
     }]
   }
 };
