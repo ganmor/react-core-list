@@ -48,5 +48,5 @@ Caveats :
 
 TODO
 ----
-- Remove dependency to underscore
-- Avoid using refs to force render of components
+- [ ] Remove dependency to underscore
+- [x] Avoid using refs to force render of components
