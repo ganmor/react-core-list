@@ -9,8 +9,6 @@ The list accepts element with different sizes, that the tricky part.
 Warning : The bigger the size difference between elements is, the more edge cases you will hit.
 If you only need elements of equals heights, you can use one of the following projects :
 
-You can find a much better implementation here http://github.com/Polymer/core-list, but it needs porting..
-
 Build : grunt build
 
 Develop : grunt serve
@@ -50,5 +48,5 @@ Caveats :
 
 TODO
 ----
-- Remove dependency to underscore
-- Avoid using refs to force render of components
+- [ ] Remove dependency to underscore
+- [x] Avoid using refs to force render of components
