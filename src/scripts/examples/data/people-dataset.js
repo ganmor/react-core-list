@@ -1,5 +1,5 @@
  module.exports = [{
-    "id": 0,
+    "id": '0-element',
     "guid": "9c2a0543-fe03-4588-80ab-cb12cb24818c",
     "isActive": true,
     "balance": "$2,406.00",
@@ -42,7 +42,7 @@
     "favoriteFruit": "apple"
 },
 {
-    "id": 1,
+    "id": '1-element',
     "guid": "ce6d1c49-92da-42c9-8d86-0565129d1a33",
     "isActive": true,
     "balance": "$1,427.00",
@@ -85,7 +85,7 @@
     "favoriteFruit": "strawberry"
 },
 {
-    "id": 2,
+    "id": '2-element',
     "guid": "c3a4b03d-10d1-4707-a0b0-46bc7f1cdce2",
     "isActive": true,
     "balance": "$2,224.00",
@@ -128,7 +128,7 @@
     "favoriteFruit": "banana"
 },
 {
-    "id": 3,
+    "id": '3-element',
     "guid": "10419caf-1ee2-464d-ba7a-01fbbcb4c3d2",
     "isActive": false,
     "balance": "$1,634.00",

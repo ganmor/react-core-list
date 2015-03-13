@@ -29,7 +29,7 @@ var Person =  React.createClass({
 
     return (<div className="item-line-style" style={{background:this.color, borderBottom:'1px solid silver'}}>
               <div>
-                <img src={this.props.element.picture} width="55"  style={{verticalAlign:'middle'}} />
+                <img src={this.props.element.picture} height="55"  style={{verticalAlign:'middle'}} />
                 <span style={{paddingLeft:'25px'}}><strong>{this.props.element.name} </strong> - {this.props.element.company}</span>
                 <div>{this.props.element.about}</div>
               </div>
@@ -64,7 +64,6 @@ var PeopleList = React.createClass({
 
     return (
       <div>
-        <UpdateButton shuffleColors={this.shuffleColors}/>
         <ReactInfiniteList>
           {elements}
         </ReactInfiniteList>
