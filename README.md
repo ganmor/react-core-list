@@ -7,7 +7,9 @@ This idea is to keep the dom as small as possible by rendering only the elements
 The list accepts element with different sizes, that the tricky part.
 
 Warning : The bigger the size difference between elements is, the more edge cases you will hit.
-If you only need elements of equals heights, you can use one of the following projects :
+
+
+Building the project :
 
 Build : grunt build
 
