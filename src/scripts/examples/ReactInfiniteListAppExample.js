@@ -62,8 +62,10 @@ var PeopleList = React.createClass({
       return (<Person element={element} key={element.id} colors={this.state.colors} />);
     }, this);
 
+		var height = window.innerHeight;
+
     return (
-      <div>
+      <div style={{height:height+'px', overflow:'auto'}}>
         <ReactInfiniteList>
           {elements}
         </ReactInfiniteList>

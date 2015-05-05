@@ -38,18 +38,32 @@ getWindowHeight = function() { return  window.innerHeight };
   DEFAULTS.MARGIN_OUT_SCREEN = 10 * DEFAULTS.DEFAULT_ITEM_HEIGHT;
 
 
+	function getScrollParent(target) {
+		if (target === window) {
+			return window;
+		}
+
+		for (var el = target; el; el = el.parentElement) {
+			var overflowY = window.getComputedStyle(el).overflowY;
+			if (overflowY === 'auto' || overflowY === 'scroll') { return el; }
+		}
+		return window;
+	}
+
+
+
  var InfiniteListComponent = React.createClass({
 
        //
        // Life Cycle
        //
 
-       componentDidMount : function () {
+        componentDidMount : function () {
 
          this._configuration = _.extend(DEFAULTS, this.props.config);
          this.setState({
            initialOffsetTop : this.getDOMNode().offsetTop,
-           viewPortHeight : (getWindowHeight() - this.getDOMNode().offsetTop - this._configuration.MARGIN_BOTTOM),
+           viewPortHeight : (getWindowHeight() - 60 - this._configuration.MARGIN_BOTTOM),
            listHeight : this.getListFullHeight()
          });
 
@@ -69,8 +83,9 @@ getWindowHeight = function() { return  window.innerHeight };
            bufferLength : 10,
            offsetTop : 0,
            differential : false,
-           realSizes : {}
-         }
+           realSizes : {},
+					 oldScroll : 0
+         };
        },
 
        componentWillReceiveProps : function () {
@@ -87,10 +102,18 @@ getWindowHeight = function() { return  window.innerHeight };
          removeElementsHeight = 0;
 
          // Not in diff mode, nothing to do
-         if (!nextState.differential) { return; }
+         if (!nextState.differential) {
+
+					 nextState.startIdx = Math.max(0, nextState.startIdx);
+					 if (nextState.offsetTop > 0 && nextState.startIdx <= 0) {
+							nextState.offsetTop = 0;
+					 }
+
+				 	return;
+				 }
 
           // #1: Get buffer size
-          bufferheight = this.refs['buffered-elements'].getDOMNode().offsetHeight;
+         bufferheight = this.refs['buffered-elements'].getDOMNode().offsetHeight;
 
          // #2: Get the remove elements height
          if (nextState.direction === 'up') {
@@ -98,76 +121,87 @@ getWindowHeight = function() { return  window.innerHeight };
            var removeElements = this.props.children.slice(nextState.endIdx, this.state.endIdx);
            _.each(removeElements, function (el, idx) {
               var refName = "infinite-list-item" + idx;
-              var el = this.refs[refName];
-              removeElementsHeight = removeElementsHeight + el.getDOMNode().offsetHeight;
+              el = this.refs[refName];
+              try {
+                removeElementsHeight = removeElementsHeight + el.getDOMNode().offsetHeight;
+              } catch(e) {
+                console.log(e);
+              }
            }, this);
 
            nextState.offsetTop = this.state.offsetTop - bufferheight;
-           console.log('Going up, new offset top will be : ' + nextState.offsetTop + ' ( ' + this.state.offsetTop + ',' + bufferheight + ')');
+          // console.log('Going up, new offset top will be : ' + nextState.offsetTop + ' ( ' + this.state.offsetTop + ',' + bufferheight + ')');
 
          } else if (nextState.direction === 'down') {
 
             var removeElements = this.props.children.slice(this.state.startIdx, nextState.startIdx);
             _.each(removeElements, function (el, idx) {
               var refName = "infinite-list-item" + idx;
-              var el = this.refs[refName];
+              el = this.refs[refName];
 
-              console.log('Will remove item with index ' + idx);
+             // console.log('Will remove item with index ' + idx);
               removeElementsHeight = removeElementsHeight + el.getDOMNode().offsetHeight;
             }, this);
 
             nextState.offsetTop = this.state.offsetTop  + removeElementsHeight;
 
-            console.log('Going down, new offset top will be : ' + nextState.offsetTop + ' ( ' + this.state.offsetTop + ',' + removeElementsHeight + ')');
-            console.log('New start idx will be ' + nextState.startIdx);
+           // console.log('Going down, new offset top will be : ' + nextState.offsetTop + ' ( ' + this.state.offsetTop + ',' + removeElementsHeight + ')');
+           // console.log('New start idx will be ' + nextState.startIdx);
          }
 
          //offsetCorrection = (nextState.startIdx < this.state.startIdx) ? -bufferSize + removeElementsSize
 
+        // Cleanup
          nextState.differential = false;
          nextState.direction = null;
 
          // Edges cases to be handled in a much cleaner way
          if (nextState.offsetTop < 0)  {
-           return this.approximateInsertion(this.getScroll());
+           return this.approximateInsertion(0);
          }
 
-        // Cleanup
-
+         nextState.startIdx = Math.max(0, nextState.startIdx);
+         if (nextState.offsetTop > 0 && nextState.startIdx <= 0) {
+            nextState.offsetTop = 0;
+         }
 
 
        },
 
        componentDidUpdate : function (prevProps, prevState) {
           // Must result for next compare
-          this.state.listRealHeight = this.refs['list-rendered'].getDOMNode().scrollHeight;
-          this.state.offsetBottom = this.state.offsetTop + this.state.listRealHeight;
+					if (this.isMounted() && this.refs['list-rendered'] && this.refs['list-rendered'].getDOMNode()) {
+						this.state.listRealHeight = this.refs['list-rendered'].getDOMNode().scrollHeight;
+						this.state.offsetBottom = this.state.offsetTop + this.state.listRealHeight;
+					}
        },
 
        render : function () {
 
          var wrapperStyle, positionningDivStyle, listSizerStyle, startIdx, endIdx, instance_;
 
-         if (!this.state.viewPortHeight) { return (<div></div>) }
+         if (!this.state.viewPortHeight) { return (<div></div>); }
 
-         this.oldScroll =  this.getScroll();
          instance_ = this;
 
          wrapperStyle = {
             width:'100%',
             position:'relative'
-          };
+         };
 
          positionningDivStyle = {
            top:  (this.state.offsetTop||0) + 'px',
            position:'absolute',
-           width:'100%'
+           width:'100%',
+					 WebkitTransform:'translateZ(0)'
          };
-
 
          listSizerStyle = {
            height : this.state.listHeight
          };
+
+
+
 
          startIdx = this.state.startIdx;
          endIdx = this.state.endIdx;
@@ -219,23 +253,24 @@ getWindowHeight = function() { return  window.innerHeight };
       */
       keepDisplayInSync : function () {
         var instance_ = this;
-        function repos() {
-          nextFrame(function () {
-            if (!instance_.isMounted()){ return; }
-
-            instance_.rePositionList.call(instance_, instance_.getScroll());
-          });
-        }
-        this.displaySyncInterval =  window.setInterval(repos, 1); // Get rid of those 50 ms ?
+				getScrollParent(this.getDOMNode()).addEventListener('scroll', this.checkDisplay);
+				getScrollParent(this.getDOMNode()).addEventListener('touchend', this.checkDisplay);
       },
 
-      tearDownDisplayUpdate : function () {
-        window.clearInterval(this.displaySyncInterval);
+			tearDownDisplayUpdate : function () {
+        var instance_ = this;
+				getScrollParent(this.getDOMNode()).removeEventListener('scroll', this.checkDisplay);
+				getScrollParent(this.getDOMNode()).removeEventListener('touchend', this.checkDisplay);
       },
 
+			checkDisplay : function () {
+				var instance_ = this;
+				if (!this.isMounted()){ return; }
+        instance_.rePositionList.call(instance_, instance_.getScroll());
+			},
 
       getScroll : function () {
-        return window.document.body.scrollTop;
+        return getScrollParent(this.getDOMNode()).scrollTop;
       },
 
       getListFullHeight: function () {
@@ -248,19 +283,20 @@ getWindowHeight = function() { return  window.innerHeight };
       //
       rePositionList: function (newScroll) {
 
-         var isGoingUp = newScroll < this.oldScroll;
-         var isGoingDown = newScroll > this.oldScroll;
-         var isGoingFlat = newScroll === this.oldScroll;
+         var isGoingUp = newScroll < this.state.oldScroll;
+         var isGoingDown = newScroll > this.state.oldScroll;
+         var isGoingFlat = newScroll === this.state.oldScroll;
+
+
 
          var isBeforeTop = (newScroll < this.state.offsetTop);
          var isAfterBottom = ((newScroll + this.state.viewPortHeight) > this.state.offsetBottom);
 
          var hasReachedTopOfTheList = (this.state.startIdx == 0);
-         var hasReachedBottomOfTheList = (this.state.endIdx == (this.props.children.length));
+         var hasReachedBottomOfTheList = (this.state.endIdx >= (this.props.children.length));
 
-         this.oldScroll = newScroll;
 
-         if ((isGoingUp || isGoingFlat) && hasReachedTopOfTheList && this.state.startIdx == 0) {
+         if ((isGoingUp || isGoingFlat) && hasReachedTopOfTheList) {
             return;
          }
 
@@ -268,7 +304,8 @@ getWindowHeight = function() { return  window.innerHeight };
             return;
          }
 
-         if ((isBeforeTop || isAfterBottom )) {
+
+         if ( (isBeforeTop && isGoingUp) || (isAfterBottom && isGoingDown) ) {
             this.approximateInsertion(newScroll);
          } else if (isGoingDown) {
             this.repositionListDown(newScroll);
@@ -280,23 +317,22 @@ getWindowHeight = function() { return  window.innerHeight };
 
       repositionListUp: function (newScroll) {
 
-         var targetOffsetTop, move, willReachTop, isTooCloseToBottom, instance_;
+         var targetOffsetTop, move, maxMove, shouldMove,  willReachTop, isTooCloseToBottom, instance_;
 
          instance_ = this;
 
-         // Check if the bottom of the list is not too close
-         isTooCloseToBottom = this.state.offsetBottom < newScroll + this.state.viewPortHeight +  ( this._configuration.MARGIN_OUT_SCREEN / 2)
 
-         // Where we want the new offset top to be
-         targetOffsetTop = newScroll - this._configuration.MARGIN_OUT_SCREEN * 2;
+				 // Compute expected destination
+				 shouldMove = newScroll < (this.state.offsetTop + 2 * this._configuration.DEFAULT_ITEM_HEIGHT);
+				 targetOffsetTop = Math.max((newScroll - this._configuration.MARGIN_OUT_SCREEN), 0);
 
          // Compute the move
-         move =  Math.max( (this.state.offsetTop - targetOffsetTop) / this._configuration.DEFAULT_ITEM_HEIGHT, 0);
+         move =  (this.state.offsetTop - targetOffsetTop) / this._configuration.DEFAULT_ITEM_HEIGHT;
 
          // Beginning of line
-         willReachTop = (this.state.startIdx-move) <= 0;
+         willReachTop = (this.state.startIdx - move) <= 0;
 
-         if ((!isTooCloseToBottom && move > 3) || willReachTop) {
+         if (shouldMove || willReachTop) {
 
            move = Math.min(move, this.state.startIdx); // Easy one
 
@@ -308,24 +344,29 @@ getWindowHeight = function() { return  window.innerHeight };
 
 
        repositionListDown: function (newScroll) {
-            var instance_, targetOffsetBottom, move, maxMove, isTooCloseToTop, willReachedBottom;
+
+            var instance_, targetOffsetBottom, move, shouldMove, maxMove, isTooCloseToTop, willReachedBottom, maximumMove;
 
             instance_ = this;
 
-            // Check if top of the list is not too close
-            isTooCloseToTop = ( newScroll - this.offsetTop ) < (this._configuration.MARGIN_OUT_SCREEN / 2);
 
-            // Where list is supposed to end now
-            targetOffsetBottom = newScroll + this.state.viewPortHeight + this._configuration.MARGIN_OUT_SCREEN * 2;
+						// Where list is supposed to end now
+						targetOffsetBottom = newScroll + this.state.viewPortHeight + this._configuration.MARGIN_OUT_SCREEN;
 
-            // Now we can compute the desired move
-            move = Math.max( (targetOffsetBottom - this.state.offsetBottom) / this._configuration.DEFAULT_ITEM_HEIGHT , 0);
 
-            // Another move
+						shouldMove = newScroll + this.state.viewPortHeight > this.state.offsetBottom - 2 * this._configuration.DEFAULT_ITEM_HEIGHT;
+
+						move = (targetOffsetBottom - this.state.offsetBottom) / this._configuration.DEFAULT_ITEM_HEIGHT;
+
+						maxMove = (newScroll - this.state.offsetTop) / this._configuration.DEFAULT_ITEM_HEIGHT;
+						move = Math.min(maxMove, move);
+
+						// Another move
             willReachedBottom = (this.state.endIdx + move) >= this.props.children.length;
 
+            var notAllAreDisplayed = this.state.endIdx < this.props.children.length;
 
-            if ((!isTooCloseToTop && move>3) || willReachedBottom) {
+            if (shouldMove && notAllAreDisplayed) {
 
                move = Math.min(move, (this.props.children.length) - this.state.endIdx);
 
@@ -337,24 +378,32 @@ getWindowHeight = function() { return  window.innerHeight };
 
        approximateInsertion: function (newScroll) {
 
-          var fullLength, fullSize, startPosition, endPosition;
+          var fullLength, fullSize, beginOffset, endOffset, startPosition, endPosition;
+					var NB_MARGIN_TOP = 10;
 
           fullLength = this.props.children.length;
 
-          startPosition = Math.round((newScroll * fullLength) / this.getListFullHeight()) - 10;
-          endPosition = Math.round(startPosition + 20);
+
+					beginOffset = Math.max(0, newScroll - this._configuration.MARGIN_OUT_SCREEN);
+
+          startPosition = Math.round(beginOffset / this._configuration.DEFAULT_ITEM_HEIGHT);
+					endPosition = Math.round(startPosition + ((this.state.viewPortHeight + 2 * this._configuration.MARGIN_OUT_SCREEN) / this._configuration.DEFAULT_ITEM_HEIGHT));
 
           startPosition =  Math.max(0, startPosition);
           endPosition = Math.min(endPosition, fullLength);
 
-          this.offsetTop = newScroll - this.state.viewPortHeight;
-          this.offsetTop <= 0 ? (this.offsetTop = 0) : (this.offsetTop = this.offsetTop);
+					var newOffsetTop =  startPosition * this._configuration.DEFAULT_ITEM_HEIGHT;
+
+          newOffsetTop = (newOffsetTop <= 0) ? 0 : newOffsetTop;
+
+				//	console.log('Approximate insertion to scroll ' + newScroll + 'new offset top will be ' + newOffsetTop + 'New start will be '  + startPosition);
 
           this.setState({
             startIdx : startPosition,
             endIdx : endPosition,
-            offsetTop : this.offsetTop,
-            phase : 'rendering'
+            offsetTop : newOffsetTop,
+            phase : 'rendering',
+						oldScroll : this.getScroll()
           });
 
        },
@@ -366,7 +415,7 @@ getWindowHeight = function() { return  window.innerHeight };
        */
        launchRenderingCycle : function (direction, move, newScroll) {
 
-         var instance_, startRenderIdx, endRenderIdx, toRender, rendering, representativeHeight, nextStartIdx, nextEndIdx, marginStart;
+         var instance_, startRenderIdx, endRenderIdx, toRender, rendering, representativeHeight, nextStartIdx, nextEndIdx, marginStart, oldScroll;
 
         instance_ = this;
         representativeHeight = 0;
@@ -397,20 +446,24 @@ getWindowHeight = function() { return  window.innerHeight };
          startRenderIdx = Math.round(startRenderIdx);
          endRenderIdx = Math.round(endRenderIdx);
 
-         this.setState({
-            startBufferIdx : startRenderIdx,
-            endBufferIdx : endRenderIdx,
-            buffering : true
-         }, function () {
-          // New items have been buffered, render new part of the list
-           // TODO: debounce
-           instance_.setState({
-             startIdx : nextStartIdx,
-             endIdx : nextEndIdx,
-             differential : true,
-             direction : direction
-           });
-         });
+				 oldScroll = this.getScroll();
+
+				 instance_.setState({
+					startBufferIdx : startRenderIdx,
+					endBufferIdx : endRenderIdx,
+					buffering : true,
+					oldScroll : oldScroll
+				 }, function () {
+					// New items have been buffered, render new part of the list
+					 // TODO: debounce
+					 instance_.setState({
+						 startIdx : nextStartIdx,
+						 endIdx : nextEndIdx,
+						 differential : true,
+						 oldScroll : oldScroll,
+						 direction : direction
+					 });
+				 });
 
        }
 
