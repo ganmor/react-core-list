@@ -20,7 +20,8 @@ It perform better in browsers that trigger scroll events during scroll momentum
 Warning : The bigger the size difference between elements is, the more edge cases you will hit.
 
 
-Building the project :
+Contribute & Build
+-------------------------
 
 Build : grunt build
 
