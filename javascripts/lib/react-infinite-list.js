@@ -64,6 +64,27 @@ function getScrollParent(target) {
 	}
 
 
+	InfiniteListItem = React.createClass({
+
+
+    getInitialState : function () {
+      return {};
+    },
+    render : function () {
+
+      var style;
+
+      if (!this.props.rendered) { return false; }
+
+      style = {};
+      style.overflow = 'hidden'
+
+      return (<div style={style}>{this.props.children}</div>);
+    }
+  });
+
+
+
 
  var InfiniteListComponent = React.createClass({
 
