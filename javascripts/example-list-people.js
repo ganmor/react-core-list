@@ -31,7 +31,7 @@ define(['lib/jsx!lib/react-infinite-list'], function (ReactInfiniteList) {
       });
 
       return (
-				<div style={{height:window.innerHeight - 150+'px', overflow:'auto'}}>
+				<div style={{height:window.innerHeight - 150+'px', overflow:'auto', WebkitOverflowScroll:'touch'}}>
 					<ReactInfiniteList>
 						{elements}
 					</ReactInfiniteList>
