@@ -33,7 +33,7 @@ How does it work :
 The very basic : 
 Only element in the current viewport are in the dom.
 
-In more details :
+In details :
 On each rendering frame, the list check the scroll position if it's before the first rendered element it adds item before if it's after it add elements after. 
 If it's way different, ( the new rendered elements and the previous ones do not overlap, it renders at an appoximation of the position based on items mean height.
 
