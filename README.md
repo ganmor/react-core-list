@@ -37,7 +37,7 @@ In details :
 On each rendering frame, the list check the scroll position if it's before the first rendered element it adds item before if it's after it add elements after. 
 If it's way different, ( the new rendered elements and the previous ones do not overlap, it renders at an appoximation of the position based on items mean height.
 
-See demo here : http://ganmor.github.io/react-infinite-list
+See demo here : http://ganmor.github.io/react-core-list
 
 
 
