@@ -7,11 +7,11 @@ This idea is to keep the dom as small as possible by rendering only the elements
 The list accepts element with different sizes, that the tricky part.
 
 Tested on :
-chrome latest
-firefox latest
-Safari mobile 7-8
-Chrome Mobile
-Android browser
+- chrome latest
+- firefox latest
+- Safari mobile 7-8
+- Chrome Mobile
+- Android browser
 
 It perform better in browsers that trigger scroll events during scroll momentum
 
