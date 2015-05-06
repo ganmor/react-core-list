@@ -44,9 +44,9 @@ See demo here : http://ganmor.github.io/react-core-list
 Example of use :
 --------------
  ```
-<ReactInfiniteList config={myConfig}>
+<ReactCoreList config={myConfig}>
   {myListOfReactComponents}
-</ReactInfiniteList>
+</ReactCoreList>
  ```
   Do not forget to add a key on your components !
  
