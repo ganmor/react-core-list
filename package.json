@@ -1,15 +1,30 @@
 {
   "name": "react-core-list",
 	"author":"morganlaupies",
+  "author": "Morgan Laupies <morgan.laupies@gmail.com> (http://github.com/ganmor)",
   "version": "0.1.0",
-  "description": "",
-  "repository": "",
+  "description": "Yet another infinte list component. Handle elements of differents height, works well on mobile devices",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ganmor/react-core-list.git"
+  },
+	"keywords": [
+    "react",
+    "infinite",
+    "scroll",
+    "list",
+    "html5",
+    "mixin",
+    "javascript",
+    "react-component"
+  ],
   "private": true,
   "src": "src",
   "test": "test",
   "dist": "dist",
   "mainInput": "src/scripts/react-infinite-list",
-  "mainOutput": "main",
+  "mainOutput": "dist/assets/react-infinite-list",
+  "homepage": "http://ganmor.github.io/react-infinite-list",
   "dependencies": {
     "json-loader": "^0.5.1",
     "react": "~0.12.2",
