@@ -1,14 +1,14 @@
 {
-  "name": "react-scrollable-list",
+  "name": "react-core-list",
 	"author":"morganlaupies",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "",
   "repository": "",
   "private": true,
   "src": "src",
   "test": "test",
   "dist": "dist",
-  "mainInput": "ReactInfiniteListApp",
+  "mainInput": "src/scripts/react-infinite-list",
   "mainOutput": "main",
   "dependencies": {
     "json-loader": "^0.5.1",
