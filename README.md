@@ -1,3 +1,7 @@
+[WARNING] Deprecated
+See other more up to date solutions :
+For example : https://github.com/bvaughn/react-virtualized
+
 react-infinite-list
 ===================
 
